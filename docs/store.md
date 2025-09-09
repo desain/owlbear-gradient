@@ -3,11 +3,11 @@ title: Gradient Paint Bucket
 description: A tool in the drawing category that adds gradients to drawings.
 author: desain
 image: https://owlbear-gradient.nicholassdesai.workers.dev/hero.png
-icon: https://owlbear-gradient.pages.dev/logo.png
+icon: https://owlbear-gradient.nicholassdesai.workers.dev/logo.png
 learn-more: https://github.com/desain/owlbear-gradient
 tags:
     - drawing
-manifest: https://owlbear-gradient.pages.dev/manifest.json
+manifest: https://owlbear-gradient.nicholassdesai.workers.dev/manifest.json
 ---
 
 # Gradient Paint Bucket

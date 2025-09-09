@@ -1,11 +1,11 @@
 {
-  "name": "Gradient Paint Bucket",
-  "description": "A tool in the drawing category that adds gradients to drawings.",
-  "version": "1.0.2",
-  "manifest_version": 1,
-  "author": "desain",
-  "icon": "/logo2.png",
-  "homepage_url": "https://github.com/desain/owlbear-gradient",
-  "background_url": "/src/background/background.html",
-  "permissions": []
+    "name": "Gradient Paint Bucket",
+    "description": "A tool in the drawing category that adds gradients to drawings.",
+    "version": "1.0.2",
+    "manifest_version": 1,
+    "author": "desain",
+    "icon": "/logo.png",
+    "homepage_url": "https://github.com/desain/owlbear-gradient",
+    "background_url": "/src/background/background.html",
+    "permissions": []
 }
