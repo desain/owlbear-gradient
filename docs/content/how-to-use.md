@@ -4,11 +4,11 @@
 
 With the drawing tool selected, click on the Gradient Paint Bucket icon in the top row:
 
-![paint bucket icon](paint-bucket-icon.png)
+![paint bucket icon](https://owlbear-gradient.nicholassdesai.workers.dev/paint-bucket-icon.png)
 
 Set your gradient parameters using the control window:
 
-![gradient controls](gradient-controls.png)
+![gradient controls](https://owlbear-gradient.nicholassdesai.workers.dev/gradient-controls.png)
 
 -   Toggle between linear and radial gradients above the color controls
 -   The top color row is a preview of your gradient
@@ -21,13 +21,13 @@ Set your gradient parameters using the control window:
 
 With the tool selected, click a shape to apply the gradient:
 
-![example gradient](example-gradient.png)
+![example gradient](https://owlbear-gradient.nicholassdesai.workers.dev/example-gradient.png)
 
 While the tool is selected, you will see control points on the shapes that have gradients. You can move these to adjust the gradient.
 
-![control points](control-points.png)
+![control points](https://owlbear-gradient.nicholassdesai.workers.dev/control-points.png)
 
-Double-click a shape to remove its gradient.
+Double-click or shift-click a shape to remove its gradient.
 
 ## Support
 

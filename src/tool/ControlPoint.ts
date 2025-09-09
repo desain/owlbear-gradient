@@ -1,11 +1,14 @@
 import {
-    buildShape,
+    buildBillboard,
     MathM,
+    type ImageContent,
+    type ImageGrid,
     type Item,
     type KeyFilter,
     type Vector2,
 } from "@owlbear-rodeo/sdk";
 import { matrixMultiply, type HasParameterizedMetadata } from "owlbear-utils";
+import cp from "../../assets/cp.svg";
 import { METADATA_KEY_CONTROL_POINT_INDEX } from "../constants";
 import type { GradientTarget } from "./GradientTarget";
 
@@ -17,22 +20,28 @@ export function buildControlPoint(
     offset: Vector2,
     index: number,
 ) {
+    const size = 512;
+    const imageContent = {
+        url: window.location.origin + cp,
+        mime: "image/svg+xml",
+        width: size,
+        height: size,
+    } satisfies ImageContent;
+    const imageGrid = {
+        dpi: size,
+        offset: { x: size / 2, y: size / 2 },
+    } satisfies ImageGrid;
+
     const transform = MathM.fromItem(target);
     return (
-        buildShape()
+        buildBillboard(imageContent, imageGrid)
             .name("Gradient Control Point")
-            .shapeType("CIRCLE")
             .metadata({ [METADATA_KEY_CONTROL_POINT_INDEX]: index })
-            .width(30)
-            .height(30)
-            .strokeColor("#3e4050")
-            .strokeOpacity(1)
-            .strokeWidth(10)
-            .fillColor("#ffffff")
-            .fillOpacity(1)
             .layer("CONTROL")
             .attachedTo(target.id)
             .position(matrixMultiply(transform, offset))
+            .scale({ x: 0.3, y: 0.3 })
+            .maxViewScale(1)
             .disableAttachmentBehavior(["COPY", "SCALE", "LOCKED"])
             .locked(true)
             // .disableHit(true)
