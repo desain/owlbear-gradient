@@ -17,6 +17,16 @@ Set your gradient parameters using the control window:
 -   The next row is a hue slider
 -   The bottom row is a transparency slider
 
+### Setting a Pattern
+
+Click the pattern sidebar button to open the pattern sidebar:
+
+![sidebar button](https://owlbear-gradient.nicholassdesai.workers.dev/sidebar-button.png)
+
+There you can select a pattern to apply instead of a gradient. Only the first and last colors configured in a gradient will be used for the pattern.
+
+![pattern sidebar](https://owlbear-gradient.nicholassdesai.workers.dev/pattern-sidebar.png)
+
 ### Applying to Shapes
 
 With the tool selected, click a shape to apply the gradient:

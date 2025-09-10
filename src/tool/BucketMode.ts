@@ -14,6 +14,7 @@ import {
     matrixMultiply,
     ORIGIN,
     WHITE_RGB,
+    zeroToOne,
     type Watcher,
 } from "owlbear-utils";
 import logo from "../../assets/logo.svg";
@@ -44,13 +45,13 @@ function getDefaultStops(metadata: Metadata): GradientStop[] {
     return [
         {
             color: WHITE_RGB,
-            alpha: 0,
-            left: 0,
+            alpha: zeroToOne(0),
+            left: zeroToOne(0),
         },
         {
             color: stop2Color,
-            alpha: 1,
-            left: 1,
+            alpha: zeroToOne(1),
+            left: zeroToOne(1),
         },
     ];
 }
@@ -151,7 +152,7 @@ export class BucketMode implements ToolMode {
         void this;
         void OBR.popover.open({
             height: 600,
-            width: 310,
+            width: 350,
             id: ID_POPOVER_SETTINGS,
             url: "/src/popoverSettings/popoverSettings.html",
             anchorElementId: elementId,
@@ -192,7 +193,7 @@ export class BucketMode implements ToolMode {
             await OBR.scene.items.updateItems([event.target], ([target]) => {
                 if (target) {
                     target.style.fillColor = "#000000";
-                    target.style.fillOpacity = 0.1;
+                    target.style.fillOpacity = 0.01;
                     const oldMetadata = target.metadata[METADATA_KEY_GRADIENT];
                     target.metadata[METADATA_KEY_GRADIENT] = {
                         controlPointOffsets:
@@ -203,6 +204,7 @@ export class BucketMode implements ToolMode {
                                 bounds,
                             ),
                         type: toolMetadata?.type ?? DEFAULT_GRADIENT_SHAPE,
+                        pattern: toolMetadata?.pattern,
                         stops:
                             toolMetadata?.stops ??
                             getDefaultStops(context.metadata),

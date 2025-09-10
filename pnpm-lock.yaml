@@ -22,7 +22,7 @@ importers:
         version: 10.1.3
       owlbear-utils:
         specifier: github:desain/owlbear-utils
-        version: https://codeload.github.com/desain/owlbear-utils/tar.gz/6afdd11739cdd6936bb32671bce5dd8fe90378f5(@types/react@19.1.12)(@typescript-eslint/parser@8.42.0(eslint@9.34.0)(typescript@5.9.2))(eslint@9.34.0)(react-dom@19.1.1(react@19.1.1))(typescript@5.9.2)
+        version: https://codeload.github.com/desain/owlbear-utils/tar.gz/42c70c26f04357100491037809a3a72d011a73d0(@types/react@19.1.12)(@typescript-eslint/parser@8.42.0(eslint@9.34.0)(typescript@5.9.2))(eslint@9.34.0)(react-dom@19.1.1(react@19.1.1))(typescript@5.9.2)
       react:
         specifier: ^19.1.1
         version: 19.1.1
@@ -32,9 +32,9 @@ importers:
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
-      zustand:
-        specifier: ^5.0.8
-        version: 5.0.8(@types/react@19.1.12)(immer@10.1.3)(react@19.1.1)
+      tinycolor2:
+        specifier: ^1.6.0
+        version: 1.6.0
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.12.2
@@ -2185,8 +2185,8 @@ packages:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
 
-  owlbear-utils@https://codeload.github.com/desain/owlbear-utils/tar.gz/6afdd11739cdd6936bb32671bce5dd8fe90378f5:
-    resolution: {tarball: https://codeload.github.com/desain/owlbear-utils/tar.gz/6afdd11739cdd6936bb32671bce5dd8fe90378f5}
+  owlbear-utils@https://codeload.github.com/desain/owlbear-utils/tar.gz/42c70c26f04357100491037809a3a72d011a73d0:
+    resolution: {tarball: https://codeload.github.com/desain/owlbear-utils/tar.gz/42c70c26f04357100491037809a3a72d011a73d0}
     version: 1.0.0
 
   own-keys@1.0.1:
@@ -2492,6 +2492,9 @@ packages:
 
   tinycolor2@1.4.2:
     resolution: {integrity: sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==}
+
+  tinycolor2@1.6.0:
+    resolution: {integrity: sha512-XPaBkWQJdsf3pLKJV9p4qN/S+fm2Oj8AIPo1BTUhg5oxkvm9+SVEGFdhyOz7tTdUTfvxMiAs4sp6/eZO2Ew+pw==}
 
   tinyexec@0.3.2:
     resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
@@ -2802,24 +2805,6 @@ packages:
 
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
-
-  zustand@5.0.8:
-    resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: '>=1.2.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
 
 snapshots:
 
@@ -4991,7 +4976,7 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  owlbear-utils@https://codeload.github.com/desain/owlbear-utils/tar.gz/6afdd11739cdd6936bb32671bce5dd8fe90378f5(@types/react@19.1.12)(@typescript-eslint/parser@8.42.0(eslint@9.34.0)(typescript@5.9.2))(eslint@9.34.0)(react-dom@19.1.1(react@19.1.1))(typescript@5.9.2):
+  owlbear-utils@https://codeload.github.com/desain/owlbear-utils/tar.gz/42c70c26f04357100491037809a3a72d011a73d0(@types/react@19.1.12)(@typescript-eslint/parser@8.42.0(eslint@9.34.0)(typescript@5.9.2))(eslint@9.34.0)(react-dom@19.1.1(react@19.1.1))(typescript@5.9.2):
     dependencies:
       '@emotion/react': 11.14.0(@types/react@19.1.12)(react@19.1.1)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.1.12)(react@19.1.1))(@types/react@19.1.12)(react@19.1.1)
@@ -5365,6 +5350,8 @@ snapshots:
 
   tinycolor2@1.4.2: {}
 
+  tinycolor2@1.6.0: {}
+
   tinyexec@0.3.2: {}
 
   tinyglobby@0.2.14:
@@ -5702,9 +5689,3 @@ snapshots:
       youch-core: 0.3.3
 
   zod@3.22.3: {}
-
-  zustand@5.0.8(@types/react@19.1.12)(immer@10.1.3)(react@19.1.1):
-    optionalDependencies:
-      '@types/react': 19.1.12
-      immer: 10.1.3
-      react: 19.1.1

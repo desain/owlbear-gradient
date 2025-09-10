@@ -1,14 +1,16 @@
 import OBR from "@owlbear-rodeo/sdk";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function usePopoverResizer(
     id: string,
-    baseHeight: number,
+    minHeight: number,
     maxHeight: number,
-    container: React.RefObject<HTMLElement | null>,
-) {
+    minWidth: number,
+    maxWidth: number,
+): (node: HTMLElement | null) => void {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
     useEffect(() => {
-        if (!container.current) {
+        if (!container) {
             return;
         }
 
@@ -16,24 +18,32 @@ export function usePopoverResizer(
             if (entries.length === 0) {
                 return;
             }
-            const entry = entries[0];
+            const box = entries[0]?.borderBoxSize?.[0];
 
-            if (!entry?.borderBoxSize) {
+            if (!box) {
                 return;
             }
 
             const height = Math.min(
                 maxHeight,
-                baseHeight + entry.borderBoxSize[0]!.blockSize,
+                Math.max(minHeight, box.blockSize),
             );
 
-            await OBR.popover.setHeight(id, height);
+            const width = Math.min(
+                maxWidth,
+                Math.max(minWidth, box.inlineSize),
+            );
+
+            await Promise.all([
+                OBR.popover.setHeight(id, height),
+                OBR.popover.setWidth(id, width),
+            ]);
         });
 
-        observer.observe(container.current);
+        observer.observe(container);
         return () => {
             observer.disconnect();
-            void OBR.popover.setHeight(id, baseHeight);
         };
-    }, [id, container, baseHeight, maxHeight]);
+    }, [id, container, minHeight, maxHeight, minWidth, maxWidth]);
+    return setContainer;
 }

@@ -1,15 +1,27 @@
-import { Box } from "@mui/material";
-import OBR, { type Metadata } from "@owlbear-rodeo/sdk";
-import { DO_NOTHING } from "owlbear-utils";
-import { useEffect, useRef, useState } from "react";
+import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
+import { Paper, Stack, ToggleButton } from "@mui/material";
+import type { Theme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import OBR, { type Metadata, type Tool } from "@owlbear-rodeo/sdk";
+import { produce } from "immer";
+import {
+    DO_NOTHING,
+    getTheme,
+    rgbToHex,
+    WHITE_RGB,
+    zeroToOne,
+    type RgbColor,
+} from "owlbear-utils";
+import { useEffect, useState } from "react";
 import ColorPicker, { useColorPicker } from "react-best-gradient-color-picker";
 import {
     ID_POPOVER_SETTINGS,
     ID_TOOL_DRAWING,
     METADATA_KEY_GRADIENT,
 } from "../constants";
-import type { GradientShape, GradientStop } from "../tool/GradientTarget";
-import type { ToolMetadata } from "../tool/ToolMetadata";
+import { type GradientStop, type Pattern } from "../tool/GradientTarget";
+import { DEFAULT_TOOL_METADATA, type ToolMetadata } from "../tool/ToolMetadata";
+import { PatternSettings } from "./PatternSettings";
 import { usePopoverResizer } from "./usePopoverResizer";
 
 type GradientObject = ReturnType<
@@ -19,14 +31,6 @@ type GradientObject = ReturnType<
 interface GradientObjectColor {
     readonly value: string;
     readonly left: number;
-}
-
-function gradientObjectType(gradientObject: GradientObject): GradientShape {
-    if (gradientObject?.gradientType === "linear-gradient") {
-        return "LINEAR";
-    } else {
-        return "RADIAL";
-    }
 }
 
 function gradientObjectAngle(
@@ -57,9 +61,9 @@ function gradientObjectStops(gradientObject: GradientObject): GradientStop[] {
                     x: Number(match[1]) / 255,
                     y: Number(match[2]) / 255,
                     z: Number(match[3]) / 255,
-                },
-                alpha: Number(match[4]),
-                left: c.left / 100,
+                } as RgbColor,
+                alpha: zeroToOne(Number(match[4])),
+                left: zeroToOne(c.left / 100),
             };
         } else {
             throw Error(`Failed to parse color: ${c.value}`);
@@ -67,59 +71,169 @@ function gradientObjectStops(gradientObject: GradientObject): GradientStop[] {
     });
 }
 
-export function Settings() {
-    const [loadedFromMetadata, setLoadedFromMetadata] = useState(false);
-    const [gradientCss, setGradientCss] = useState(
-        "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,1) 100%)",
-    );
-    const { getGradientObject } = useColorPicker(gradientCss, setGradientCss);
-    const box: React.RefObject<HTMLElement | null> = useRef(null);
-    usePopoverResizer(ID_POPOVER_SETTINGS, 10, 1000, box);
+function useLoadToolMetadata<M>(id: Tool["id"], key: keyof Metadata) {
+    const [loadedMetadata, setLoadedMetadata] = useState<M>();
 
+    // Effect to load metadata from OBR
     useEffect(() => {
-        if (loadedFromMetadata) {
-            const handler = setTimeout(() => {
-                const gradientObject = getGradientObject(gradientCss);
-                void OBR.tool.setMetadata(ID_TOOL_DRAWING, {
-                    [METADATA_KEY_GRADIENT]: {
-                        css: gradientCss,
-                        type: gradientObjectType(gradientObject),
-                        angle: gradientObjectAngle(gradientObject),
-                        stops: gradientObjectStops(gradientObject),
-                    } satisfies ToolMetadata,
-                });
-            }, 100);
-            return () => clearTimeout(handler);
-        } else {
+        void OBR.tool.getMetadata(id).then((md: Metadata | undefined) => {
+            const data = md?.[key] as M | undefined;
+            if (data) {
+                setLoadedMetadata(data);
+            }
+        });
+    }, [id, key]);
+    return loadedMetadata;
+}
+
+function useSaveToolMetadata<M>(
+    id: Tool["id"],
+    key: keyof Metadata,
+    metadata: M,
+    enabled = true,
+) {
+    // Effect to write metadata to OBR
+    useEffect(() => {
+        // don't write until we've read first
+        if (!enabled) {
             return DO_NOTHING;
         }
-    }, [getGradientObject, gradientCss, loadedFromMetadata]);
 
-    useEffect(() => {
-        const setGradientFromMetadata = (md: Metadata | undefined) => {
-            const gradient = md?.[METADATA_KEY_GRADIENT] as
-                | ToolMetadata
-                | undefined;
-            if (gradient) {
-                setGradientCss(gradient.css);
-            }
-        };
-        void OBR.tool
-            .getMetadata(ID_TOOL_DRAWING)
-            .then(setGradientFromMetadata)
-            .then(() => {
-                setLoadedFromMetadata(true);
+        // debounce
+        const handler = setTimeout(() => {
+            void OBR.tool.setMetadata(id, {
+                [key]: metadata,
             });
-    }, []);
+        }, 100);
+        return () => clearTimeout(handler);
+    }, [enabled, id, key, metadata]);
+}
+
+function SettingsTabs() {
+    const [toolMetadata, setToolMetadata] = useState<ToolMetadata>();
+    const loadedToolMetadata = useLoadToolMetadata<ToolMetadata>(
+        ID_TOOL_DRAWING,
+        METADATA_KEY_GRADIENT,
+    );
+    useSaveToolMetadata(
+        ID_TOOL_DRAWING,
+        METADATA_KEY_GRADIENT,
+        toolMetadata,
+        !!loadedToolMetadata,
+    );
+    const [patternFlyoutOpen, setPatternFlyoutOpen] = useState(false);
+    const [needsSetLinear, setNeedsSetLinear] = useState(false);
+
+    // when we load the tool metadata, use it as our active tool metadata
+    useEffect(() => {
+        if (loadedToolMetadata) {
+            setToolMetadata(loadedToolMetadata);
+            if (loadedToolMetadata.pattern) {
+                setPatternFlyoutOpen(true);
+            }
+        }
+    }, [loadedToolMetadata]);
+    const { getGradientObject, setLinear } = useColorPicker(
+        toolMetadata?.css ?? DEFAULT_TOOL_METADATA.css,
+        setGradientCss,
+    );
+
+    // effect to defer setting linear for a render cycle
+    useEffect(() => {
+        if (needsSetLinear) {
+            setLinear();
+            setNeedsSetLinear(false);
+        }
+    }, [needsSetLinear, setLinear]);
+
+    function setGradientCss(css: string) {
+        const gradientObject = getGradientObject(css);
+        setToolMetadata(
+            produce(toolMetadata, (draft) => {
+                if (!draft) {
+                    return;
+                }
+                draft.css = css;
+                draft.type = css.startsWith("linear-gradient")
+                    ? "LINEAR"
+                    : "RADIAL";
+                draft.angle = gradientObjectAngle(gradientObject);
+                draft.stops = gradientObjectStops(gradientObject);
+            }),
+        );
+    }
+
+    function setPattern(pattern?: Pattern) {
+        setToolMetadata(
+            produce(toolMetadata, (draft) => {
+                if (!draft) {
+                    return;
+                }
+                draft.pattern = pattern;
+            }),
+        );
+        setNeedsSetLinear(true);
+    }
+
+    const box = usePopoverResizer(ID_POPOVER_SETTINGS, 10, 1000, 0, 600);
 
     return (
-        <Box ref={box} sx={{ p: 1 }}>
-            <ColorPicker
-                value={gradientCss}
-                onChange={setGradientCss}
-                hideEyeDrop
-                hideColorTypeBtns
-            />
-        </Box>
+        toolMetadata && (
+            <Stack
+                direction="row"
+                gap={1}
+                ref={box}
+                sx={{ display: "inline-flex" }}
+            >
+                <ColorPicker
+                    value={toolMetadata.css}
+                    onChange={setGradientCss}
+                    hideEyeDrop
+                    hideColorTypeBtns
+                />
+                <ToggleButton
+                    value="pattern"
+                    selected={patternFlyoutOpen}
+                    onChange={() => {
+                        const newIsOpen = !patternFlyoutOpen;
+                        setPatternFlyoutOpen(newIsOpen);
+                    }}
+                    aria-label="Toggle Pattern Settings"
+                >
+                    <AutoAwesomeMotionIcon />
+                </ToggleButton>
+                {patternFlyoutOpen && (
+                    <Paper sx={{ p: 1 }}>
+                        <PatternSettings
+                            toolMetadata={toolMetadata}
+                            onPatternChange={setPattern}
+                            primaryColor={rgbToHex(
+                                toolMetadata.stops[0]?.color ?? WHITE_RGB,
+                            )}
+                            secondaryColor={rgbToHex(
+                                toolMetadata.stops[
+                                    toolMetadata.stops.length - 1
+                                ]?.color ?? WHITE_RGB,
+                            )}
+                        />
+                    </Paper>
+                )}
+            </Stack>
+        )
     );
+}
+
+export function Settings() {
+    const [theme, setTheme] = useState<Theme>();
+
+    useEffect(() => {
+        void OBR.theme.getTheme().then((t) => setTheme(getTheme(t)));
+        return OBR.theme.onChange((t) => setTheme(getTheme(t)));
+    });
+
+    return theme ? (
+        <ThemeProvider theme={theme}>
+            <SettingsTabs />
+        </ThemeProvider>
+    ) : null;
 }

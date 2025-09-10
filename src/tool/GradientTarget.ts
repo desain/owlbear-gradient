@@ -9,8 +9,12 @@ import {
     type Shape,
     type Vector2,
 } from "@owlbear-rodeo/sdk";
-import type { Vector3 } from "@owlbear-rodeo/sdk/lib/types/Vector3";
-import { isObject, type HasParameterizedMetadata } from "owlbear-utils";
+import {
+    isObject,
+    type HasParameterizedMetadata,
+    type RgbColor,
+    type ZeroToOne,
+} from "owlbear-utils";
 import { METADATA_KEY_GRADIENT } from "../constants";
 
 export type GradientShape = "LINEAR" | "RADIAL";
@@ -19,9 +23,9 @@ export const DEFAULT_GRADIENT_SHAPE: GradientShape = "RADIAL";
 export type Pattern = "STRIPE" | "SIN" | "TRIANGLE_WAVE" | "HATCH" | "CHECKER";
 
 export interface GradientStop {
-    readonly color: Vector3;
-    readonly alpha: number;
-    readonly left: number;
+    readonly color: RgbColor;
+    readonly alpha: ZeroToOne;
+    readonly left: ZeroToOne;
 }
 
 export interface GradientMetadata {

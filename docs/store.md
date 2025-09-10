@@ -1,6 +1,6 @@
 ---
 title: Gradient Paint Bucket
-description: A tool in the drawing category that adds gradients to drawings.
+description: A tool in the drawing category that adds gradients and patterns to drawings.
 author: desain
 image: https://owlbear-gradient.nicholassdesai.workers.dev/hero.png
 icon: https://owlbear-gradient.nicholassdesai.workers.dev/logo.png
@@ -12,12 +12,13 @@ manifest: https://owlbear-gradient.nicholassdesai.workers.dev/manifest.json
 
 # Gradient Paint Bucket
 
-A tool in the drawing category that adds gradients to drawings.
+A tool in the drawing category that adds gradients and patterns to drawings.
 
 ## Features
 
--   🎨 Draw linear and radial gradients on objects
--   🕹️ Easily adjust gradients with control points
+-   🎨 Draw linear and radial gradients on shapes
+-   🏁 Add patterns like checkerboard, stripes, and more
+-   🕹️ Easily adjust gradients and patterns with control points
 
 ## How to use
 
@@ -37,6 +38,16 @@ Set your gradient parameters using the control window:
     -   Delete stops by clicking them then clicking the trash icon
 -   The next row is a hue slider
 -   The bottom row is a transparency slider
+
+### Setting a Pattern
+
+Click the pattern sidebar button to open the pattern sidebar:
+
+![sidebar button](https://owlbear-gradient.nicholassdesai.workers.dev/sidebar-button.png)
+
+There you can select a pattern to apply instead of a gradient. Only the first and last colors configured in a gradient will be used for the pattern.
+
+![pattern sidebar](https://owlbear-gradient.nicholassdesai.workers.dev/pattern-sidebar.png)
 
 ### Applying to Shapes
 

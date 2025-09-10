@@ -99,6 +99,7 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
     ];
 
     const indexedStops = [...withIndices(metadata.stops)];
+    const colorLast = color(metadata.stops.length - 1);
     effect.sksl = `
         ${metadata.controlPointOffsets
             .map((_, i) => `uniform vec2 ${controlPointUniform(i)};`)
@@ -128,7 +129,7 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
             vec2 ap = p - a;
             if (a == b) { return vec2(0.0); } // degenerate segment: define uv=origin
             return vec2(length(ap) / length(ab),
-                        acos(dot(normalize(ab), normalize(ap))));
+                        4 * acos(dot(normalize(ab), normalize(ap))) / PI);
         }
 
         vec4 gradient(vec2 uv) {
@@ -147,7 +148,7 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
         }
 
         vec4 stripe(vec2 uv) {
-            return mix(${color(0)}, ${color(1)},
+            return mix(${color(0)}, ${colorLast},
                 smoothstep(-0.01, 0.01, sin(uv.x * 2.0 * PI)));
         }
 
@@ -165,12 +166,12 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
         vec4 hatch(vec2 uv) {
             vec2 fuv = fract(uv);
             return any(lessThan(fract(uv), vec2(0.1)))
-                ? ${color(0)} : ${color(1)};
+                ? ${color(0)} : ${colorLast};
         }
 
         vec4 checker(vec2 uv) {
             bvec2 b = lessThan(fract(uv), vec2(0.5));
-            return b[0] != b[1] ? ${color(0)} : ${color(1)};
+            return b[0] != b[1] ? ${color(0)} : ${colorLast};
         }
         
         half4 main(in vec2 coord) {

@@ -4,8 +4,9 @@ Owlbear Rodeo extension to draw gradients on shapes.
 
 ## Features
 
--   🎨 Draw linear and radial gradients on objects
--   🕹️ Easily adjust gradients with control points
+-   🎨 Draw linear and radial gradients on shapes
+-   🏁 Add patterns like checkerboard, stripes, and more
+-   🕹️ Easily adjust gradients and patterns with control points
 
 ## How to use
 
@@ -25,6 +26,16 @@ Set your gradient parameters using the control window:
     -   Delete stops by clicking them then clicking the trash icon
 -   The next row is a hue slider
 -   The bottom row is a transparency slider
+
+### Setting a Pattern
+
+Click the pattern sidebar button to open the pattern sidebar:
+
+![sidebar button](https://owlbear-gradient.nicholassdesai.workers.dev/sidebar-button.png)
+
+There you can select a pattern to apply instead of a gradient. Only the first and last colors configured in a gradient will be used for the pattern.
+
+![pattern sidebar](https://owlbear-gradient.nicholassdesai.workers.dev/pattern-sidebar.png)
 
 ### Applying to Shapes
 
@@ -48,7 +59,7 @@ After checkout, run `pnpm install`.
 
 ## How it Works
 
-This project is a Typescript app with Vite as a bundler, using Material UI React components and a Zustand store.
+This project is a Typescript app with Vite as a bundler, using Material UI React components.
 
 Icons from https://game-icons.net.
 
