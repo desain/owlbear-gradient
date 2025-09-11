@@ -172,7 +172,9 @@ function SettingsTabs() {
                 draft.pattern = pattern;
             }),
         );
-        setNeedsSetLinear(true);
+        if (pattern) {
+            setNeedsSetLinear(true);
+        }
     }
 
     const box = usePopoverResizer(ID_POPOVER_SETTINGS, 10, 1000, 0, 600);
