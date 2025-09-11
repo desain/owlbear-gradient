@@ -1,7 +1,7 @@
 {
   "name": "Gradient Paint Bucket",
   "description": "A tool in the drawing category that adds gradients and patterns to drawings.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest_version": 1,
   "author": "desain",
   "icon": "/logo.png",
