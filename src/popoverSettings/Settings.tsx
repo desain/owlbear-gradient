@@ -33,15 +33,10 @@ interface GradientObjectColor {
     readonly left: number;
 }
 
-function gradientObjectAngle(
-    gradientObject: GradientObject,
-): number | undefined {
-    const degrees = gradientObject?.degrees;
-    if (degrees) {
-        const match = /\d+/.exec(degrees);
-        if (match) {
-            return Number(match[0]);
-        }
+function gradientAngle(css: string): number | undefined {
+    const match = /(\d+)deg/.exec(css);
+    if (match?.[1]) {
+        return Number(match[1]);
     }
     return undefined;
 }
@@ -154,10 +149,12 @@ function SettingsTabs() {
                     return;
                 }
                 draft.css = css;
+                // can't pull this from object, object is buggy
                 draft.type = css.startsWith("linear-gradient")
                     ? "LINEAR"
                     : "RADIAL";
-                draft.angle = gradientObjectAngle(gradientObject);
+                // can't pull this from object, object is buggy
+                draft.angle = gradientAngle(css);
                 draft.stops = gradientObjectStops(gradientObject);
             }),
         );
@@ -231,7 +228,7 @@ export function Settings() {
     useEffect(() => {
         void OBR.theme.getTheme().then((t) => setTheme(getTheme(t)));
         return OBR.theme.onChange((t) => setTheme(getTheme(t)));
-    });
+    }, []);
 
     return theme ? (
         <ThemeProvider theme={theme}>

@@ -81,7 +81,8 @@ To make a production build run:
 
 ## To do
 
--   UI for patterns
+-   Pattern ideas
+    -   Spiral?
 
 ## License
 
