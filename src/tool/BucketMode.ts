@@ -63,7 +63,7 @@ function getDefaultControlPoints(
 ): [a: Vector2, b: Vector2] {
     const shape = toolMetadata?.type ?? DEFAULT_GRADIENT_SHAPE;
     const centerOffset = Math2.rotate(
-        { x: 0, y: -(Math.min(bounds.width, bounds.height) / 2) },
+        { x: 0, y: Math.min(bounds.width, bounds.height) / 2 },
         ORIGIN,
         toolMetadata?.angle ?? 0,
     );

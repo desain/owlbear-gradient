@@ -49,9 +49,9 @@ const color = (i: number) =>
 function uvFunction(shape: GradientShape) {
     switch (shape) {
         case "LINEAR":
-            return "linearUv";
+            return "linearSt";
         case "RADIAL":
-            return "radialUv";
+            return "radialSt";
     }
 }
 
@@ -114,7 +114,7 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
         const float PI = 3.1415926538;
         
         // TODO: find matrix that takes unit line on X axis to a->b, invert, multiply p?
-        vec2 linearUv(vec2 p, vec2 a, vec2 b) {
+        vec2 linearSt(vec2 p, vec2 a, vec2 b) {
             vec2 ab = b - a;
             vec2 ap = p - a;
             float denom = dot(ab, ab);
@@ -124,20 +124,22 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
             return vec2(dot(ap, ab) / denom, dot(ap,perpab) / denom);
         }
         
-        vec2 radialUv(vec2 p, vec2 a, vec2 b) {
+        vec2 radialSt(vec2 p, vec2 a, vec2 b) {
             vec2 ab = b - a;
             vec2 ap = p - a;
             if (a == b) { return vec2(0.0); } // degenerate segment: define uv=origin
+            float det = ab.x * ap.y - ab.y * ap.x;
+            float angle = atan(det, dot(ab, ap));
             return vec2(length(ap) / length(ab),
-                        4 * acos(dot(normalize(ab), normalize(ap))) / PI);
+                        4 * angle / PI);
         }
 
-        vec4 gradient(vec2 uv) {
-            if (uv.x <= ${left(0)}) return ${color(0)};
+        vec4 gradient(vec2 st) {
+            if (st.s <= ${left(0)}) return ${color(0)};
             ${[...pairs(indexedStops)]
                 .map(
-                    ([[, ai], [, bi]]) => `else if (uv.x <= ${left(bi)}) {
-                        float a = (uv.x - ${left(ai)}) / (${left(bi)} - ${left(
+                    ([[, ai], [, bi]]) => `else if (st.s <= ${left(bi)}) {
+                        float a = (st.s - ${left(ai)}) / (${left(bi)} - ${left(
                         ai,
                     )});
                         return mix(${color(ai)}, ${color(bi)}, a);
@@ -147,36 +149,35 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
             else return ${color(metadata.stops.length - 1)};
         }
 
-        vec4 stripe(vec2 uv) {
+        vec4 stripe(vec2 st) {
             return mix(${color(0)}, ${colorLast},
-                smoothstep(-0.01, 0.01, sin(uv.x * 2.0 * PI)));
+                smoothstep(-0.01, 0.01, sin(st.s * 2.0 * PI)));
         }
 
-        vec4 sinWave(vec2 uv) {
-            return stripe(uv + vec2(0.2 * sin(uv.y * PI)));
+        vec4 sinWave(vec2 st) {
+            return stripe(st + vec2(0.2 * sin(st.t * PI)));
         }
 
-        vec4 triangleWave(vec2 uv) {
+        vec4 triangleWave(vec2 st) {
             float a = 0.2; // amplitude; period = 1
             // fract = mod 1
-            float wave = 4 * a * abs(fract(uv.y-0.25) - 0.5) - a;
-            return stripe(uv + vec2(wave));
+            float wave = 4 * a * abs(fract(st.t-0.25) - 0.5) - a;
+            return stripe(st + vec2(wave));
         }
         
-        vec4 hatch(vec2 uv) {
-            vec2 fuv = fract(uv);
-            return any(lessThan(fract(uv), vec2(0.1)))
+        vec4 hatch(vec2 st) {
+            return any(lessThan(fract(st), vec2(0.1)))
                 ? ${color(0)} : ${colorLast};
         }
 
-        vec4 checker(vec2 uv) {
-            bvec2 b = lessThan(fract(uv), vec2(0.5));
+        vec4 checker(vec2 st) {
+            bvec2 b = lessThan(fract(st), vec2(0.5));
             return b[0] != b[1] ? ${color(0)} : ${colorLast};
         }
         
         half4 main(in vec2 coord) {
-            vec2 uv = ${uvFunction(metadata.type)}(coord, ${cp0}, ${cp1});
-            return ${patternFunction(metadata.pattern)}(uv);
+            vec2 st = ${uvFunction(metadata.type)}(coord, ${cp0}, ${cp1});
+            return ${patternFunction(metadata.pattern)}(st);
         }
     `;
 }
