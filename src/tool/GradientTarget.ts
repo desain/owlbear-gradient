@@ -20,7 +20,7 @@ import { METADATA_KEY_GRADIENT } from "../constants";
 export type GradientShape = "LINEAR" | "RADIAL";
 export const DEFAULT_GRADIENT_SHAPE: GradientShape = "RADIAL";
 
-export type Pattern = "STRIPE" | "SIN" | "TRIANGLE_WAVE" | "HATCH" | "CHECKER";
+export type Pattern = "STRIPE" | "SIN" | "TRIANGLE_WAVE" | "HATCH" | "CHECKER" | "POLKA";
 
 export interface GradientStop {
     readonly color: RgbColor;

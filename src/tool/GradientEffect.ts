@@ -69,6 +69,8 @@ function patternFunction(pattern?: Pattern) {
             return "hatch";
         case "CHECKER":
             return "checker";
+        case "POLKA":
+            return "polka";
     }
 }
 
@@ -168,6 +170,15 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
         vec4 hatch(vec2 st) {
             return any(lessThan(fract(st), vec2(0.1)))
                 ? ${color(0)} : ${colorLast};
+        }
+
+        vec4 polka(vec2 st) {
+            vec2 offset = vec2(0.0, 0.5 * step(0.5, fract(st.s)));
+            vec2 point = fract(2 * st + offset);
+            float dist = distance(point, vec2(0.5));
+            return mix(${color(
+                0,
+            )}, ${colorLast}, smoothstep(0.299, 0.301, dist));
         }
 
         vec4 checker(vec2 st) {

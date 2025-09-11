@@ -142,6 +142,50 @@ export function PatternPreview({
                         />
                     </>
                 );
+            case "POLKA": {
+                const r = width / 8;
+                return (
+                    <>
+                        <rect
+                            x="0"
+                            y="0"
+                            width={width}
+                            height={height}
+                            fill={secondaryColor}
+                        />
+                        <circle
+                            cx={width * 0.2}
+                            cy={height * 0.2}
+                            r={r}
+                            fill={primaryColor}
+                        />
+                        <circle
+                            cx={width * 0.2}
+                            cy={height * 0.8}
+                            r={r}
+                            fill={primaryColor}
+                        />
+                        <circle
+                            cx={width * 0.5}
+                            cy={height * 0.5}
+                            r={r}
+                            fill={primaryColor}
+                        />
+                        <circle
+                            cx={width * 0.8}
+                            cy={height * 0.2}
+                            r={r}
+                            fill={primaryColor}
+                        />
+                        <circle
+                            cx={width * 0.8}
+                            cy={height * 0.8}
+                            r={r}
+                            fill={primaryColor}
+                        />
+                    </>
+                );
+            }
         }
     };
 

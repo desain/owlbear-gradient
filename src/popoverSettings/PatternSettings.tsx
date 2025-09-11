@@ -9,6 +9,7 @@ const PATTERNS: Pattern[] = [
     "TRIANGLE_WAVE",
     "HATCH",
     "CHECKER",
+    "POLKA",
 ];
 
 interface PatternSettingsProps {
