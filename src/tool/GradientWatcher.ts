@@ -1,5 +1,5 @@
 import OBR, { isEffect, type BlendMode, type Item } from "@owlbear-rodeo/sdk";
-import type { ItemWatcher, Patcher } from "owlbear-utils";
+import { DO_NOTHING, type ItemWatcher, type Patcher } from "owlbear-utils";
 import { METADATA_KEY_GRADIENT } from "../constants";
 import { buildControlPoint } from "./ControlPoint";
 import { buildGradientEffect, fixEffect } from "./GradientEffect";
@@ -23,6 +23,18 @@ export class GradientWatcher implements ItemWatcher<GradientTarget> {
         patcher.addLocal(effect);
     };
 
+    readonly #deleteEffect = (patcher: Patcher) => {
+        if (this.#effectId) {
+            patcher.deleteLocal(this.#effectId);
+            this.#effectId = undefined;
+            this.#previousBlendMode = undefined;
+        }
+        if (this.#controlPoints) {
+            patcher.deleteLocal(...this.#controlPoints);
+            this.#controlPoints = undefined;
+        }
+    };
+
     constructor(target: GradientTarget, patcher: Patcher) {
         this.#targetId = target.id;
         if (target.metadata[METADATA_KEY_GRADIENT]) {
@@ -37,21 +49,18 @@ export class GradientWatcher implements ItemWatcher<GradientTarget> {
         // Workaround: OBR doesn't currently support updating blend modes on effects.
         // To change the blend mode, we have to recreate the effect.
         const blendMode = metadata?.blendMode;
-        if (this.#effectId && blendMode !== this.#previousBlendMode) {
-            patcher.deleteLocal(this.#effectId);
-            this.#effectId = undefined;
-            this.#previousBlendMode = undefined;
+        if (
+            this.#effectId &&
+            effectShouldExist &&
+            blendMode !== this.#previousBlendMode
+        ) {
+            this.#deleteEffect(patcher);
         }
 
         if (!this.#effectId && effectShouldExist) {
             this.#createEffect(target, patcher);
         } else if (this.#effectId && !effectShouldExist) {
-            patcher.deleteLocal(this.#effectId);
-            this.#effectId = undefined;
-            if (this.#controlPoints) {
-                patcher.deleteLocal(...this.#controlPoints);
-                this.#controlPoints = undefined;
-            }
+            this.#deleteEffect(patcher);
         } else if (this.#effectId && effectShouldExist) {
             void patcher.updateLocal(this.#effectId, (effect) => {
                 if (isEffect(effect)) {
@@ -59,18 +68,11 @@ export class GradientWatcher implements ItemWatcher<GradientTarget> {
                 }
             });
         }
+
         this.#fixControlPoints(patcher);
     };
 
-    readonly handleItemDelete = (/*patcher: Patcher*/) => {
-        void this;
-        // if (this.#effectId) {
-        //     patcher.deleteLocal(this.#effectId);
-        // }
-        // if (this.#controlPoints) {
-        //     patcher.deleteLocal(...this.#controlPoints);
-        // }
-    };
+    readonly handleItemDelete = DO_NOTHING; // attachment logic handles deletion
 
     readonly handleMessage = (message: unknown, patcher: Patcher) => {
         if (typeof message === "boolean") {
