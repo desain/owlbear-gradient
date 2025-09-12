@@ -85,6 +85,7 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
     ) {
         return;
     }
+    effect.blendMode = metadata.blendMode ?? "SRC_OVER";
     effect.uniforms = [
         ...metadata.controlPointOffsets.map((offset, i) => ({
             name: controlPointUniform(i),

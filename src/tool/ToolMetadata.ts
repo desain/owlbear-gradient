@@ -1,3 +1,4 @@
+import type { BlendMode } from "@owlbear-rodeo/sdk";
 import { BLACK_RGB, WHITE_RGB, zeroToOne } from "owlbear-utils";
 import type { GradientShape, GradientStop, Pattern } from "./GradientTarget";
 
@@ -5,6 +6,7 @@ export interface ToolMetadata {
     readonly css: string;
     readonly type: GradientShape;
     readonly pattern?: Pattern;
+    readonly blendMode?: BlendMode;
     readonly angle?: number;
     readonly stops: GradientStop[];
 }

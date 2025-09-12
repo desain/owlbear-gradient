@@ -1,10 +1,22 @@
 import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
-import { Paper, Stack, ToggleButton } from "@mui/material";
+import LayersIcon from "@mui/icons-material/Layers";
+import {
+    Paper,
+    Stack,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+} from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
-import OBR, { type Metadata, type Tool } from "@owlbear-rodeo/sdk";
+import OBR, {
+    type BlendMode,
+    type Metadata,
+    type Tool,
+} from "@owlbear-rodeo/sdk";
 import { produce } from "immer";
 import {
+    BLEND_MODES,
     DO_NOTHING,
     getTheme,
     rgbToHex,
@@ -116,7 +128,7 @@ function SettingsTabs() {
         toolMetadata,
         !!loadedToolMetadata,
     );
-    const [patternFlyoutOpen, setPatternFlyoutOpen] = useState(false);
+    const [openFlyout, setOpenFlyout] = useState<string | undefined>();
     const [needsSetLinear, setNeedsSetLinear] = useState(false);
 
     // when we load the tool metadata, use it as our active tool metadata
@@ -124,7 +136,7 @@ function SettingsTabs() {
         if (loadedToolMetadata) {
             setToolMetadata(loadedToolMetadata);
             if (loadedToolMetadata.pattern) {
-                setPatternFlyoutOpen(true);
+                setOpenFlyout("pattern");
             }
         }
     }, [loadedToolMetadata]);
@@ -174,6 +186,17 @@ function SettingsTabs() {
         }
     }
 
+    function setBlendMode(blendMode?: BlendMode): void {
+        setToolMetadata(
+            produce(toolMetadata, (draft) => {
+                if (!draft) {
+                    return;
+                }
+                draft.blendMode = blendMode;
+            }),
+        );
+    }
+
     const box = usePopoverResizer(ID_POPOVER_SETTINGS, 10, 1000, 0, 600);
 
     return (
@@ -190,18 +213,26 @@ function SettingsTabs() {
                     hideEyeDrop
                     hideColorTypeBtns
                 />
-                <ToggleButton
-                    value="pattern"
-                    selected={patternFlyoutOpen}
-                    onChange={() => {
-                        const newIsOpen = !patternFlyoutOpen;
-                        setPatternFlyoutOpen(newIsOpen);
-                    }}
-                    aria-label="Toggle Pattern Settings"
+                <ToggleButtonGroup
+                    orientation="vertical"
+                    value={openFlyout}
+                    exclusive
+                    onChange={(_, v?: string) => setOpenFlyout(v)}
                 >
-                    <AutoAwesomeMotionIcon />
-                </ToggleButton>
-                {patternFlyoutOpen && (
+                    <ToggleButton
+                        value="pattern"
+                        aria-label="Toggle Pattern Settings"
+                    >
+                        <AutoAwesomeMotionIcon />
+                    </ToggleButton>
+                    <ToggleButton
+                        value="blend-mode"
+                        aria-label="Toggle Blend Mode Settings"
+                    >
+                        <LayersIcon />
+                    </ToggleButton>
+                </ToggleButtonGroup>
+                {openFlyout === "pattern" && (
                     <Paper sx={{ p: 1 }}>
                         <PatternSettings
                             toolMetadata={toolMetadata}
@@ -215,6 +246,27 @@ function SettingsTabs() {
                                 ]?.color ?? WHITE_RGB,
                             )}
                         />
+                    </Paper>
+                )}
+                {openFlyout === "blend-mode" && (
+                    <Paper sx={{ p: 1, maxHeight: 590, overflowY: "auto" }}>
+                        <Typography sx={{ mb: 2, textAlign: "center" }}>
+                            Blend Mode
+                        </Typography>
+                        <ToggleButtonGroup
+                            orientation="vertical"
+                            value={toolMetadata.blendMode ?? "SRC_OVER"}
+                            exclusive
+                            onChange={(_, v?: BlendMode) => {
+                                setBlendMode(v);
+                            }}
+                        >
+                            {BLEND_MODES.map((mode) => (
+                                <ToggleButton key={mode} value={mode}>
+                                    {mode}
+                                </ToggleButton>
+                            ))}
+                        </ToggleButtonGroup>
                     </Paper>
                 )}
             </Stack>

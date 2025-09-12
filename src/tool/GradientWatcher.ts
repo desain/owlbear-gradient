@@ -1,4 +1,4 @@
-import OBR, { isEffect, type Item } from "@owlbear-rodeo/sdk";
+import OBR, { isEffect, type BlendMode, type Item } from "@owlbear-rodeo/sdk";
 import type { ItemWatcher, Patcher } from "owlbear-utils";
 import { METADATA_KEY_GRADIENT } from "../constants";
 import { buildControlPoint } from "./ControlPoint";
@@ -8,6 +8,7 @@ import { isGradientTarget, type GradientTarget } from "./GradientTarget";
 export class GradientWatcher implements ItemWatcher<GradientTarget> {
     readonly #targetId: string;
     #effectId?: string;
+    #previousBlendMode?: BlendMode;
     #showControlPoints = false;
     #controlPoints?: [a: string, b: string];
 
@@ -17,6 +18,8 @@ export class GradientWatcher implements ItemWatcher<GradientTarget> {
     readonly #createEffect = (target: GradientTarget, patcher: Patcher) => {
         const effect = buildGradientEffect(target);
         this.#effectId = effect.id;
+        this.#previousBlendMode =
+            target.metadata[METADATA_KEY_GRADIENT]?.blendMode;
         patcher.addLocal(effect);
     };
 
@@ -28,7 +31,18 @@ export class GradientWatcher implements ItemWatcher<GradientTarget> {
     }
 
     readonly handleItemUpdate = (target: GradientTarget, patcher: Patcher) => {
-        const effectShouldExist = !!target.metadata[METADATA_KEY_GRADIENT];
+        const metadata = target.metadata[METADATA_KEY_GRADIENT];
+        const effectShouldExist = !!metadata;
+
+        // Workaround: OBR doesn't currently support updating blend modes on effects.
+        // To change the blend mode, we have to recreate the effect.
+        const blendMode = metadata?.blendMode;
+        if (this.#effectId && blendMode !== this.#previousBlendMode) {
+            patcher.deleteLocal(this.#effectId);
+            this.#effectId = undefined;
+            this.#previousBlendMode = undefined;
+        }
+
         if (!this.#effectId && effectShouldExist) {
             this.#createEffect(target, patcher);
         } else if (this.#effectId && !effectShouldExist) {

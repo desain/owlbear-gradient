@@ -2,6 +2,7 @@ import {
     isCurve,
     isPath,
     isShape,
+    type BlendMode,
     type Curve,
     type Item,
     type KeyFilter,
@@ -20,7 +21,13 @@ import { METADATA_KEY_GRADIENT } from "../constants";
 export type GradientShape = "LINEAR" | "RADIAL";
 export const DEFAULT_GRADIENT_SHAPE: GradientShape = "RADIAL";
 
-export type Pattern = "STRIPE" | "SIN" | "TRIANGLE_WAVE" | "HATCH" | "CHECKER" | "POLKA";
+export type Pattern =
+    | "STRIPE"
+    | "SIN"
+    | "TRIANGLE_WAVE"
+    | "HATCH"
+    | "CHECKER"
+    | "POLKA";
 
 export interface GradientStop {
     readonly color: RgbColor;
@@ -31,6 +38,7 @@ export interface GradientStop {
 export interface GradientMetadata {
     readonly type: GradientShape;
     readonly pattern?: Pattern;
+    readonly blendMode?: BlendMode;
     readonly controlPointOffsets: [a: Vector2, b: Vector2];
     readonly stops: GradientStop[];
 }

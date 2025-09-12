@@ -205,6 +205,7 @@ export class BucketMode implements ToolMode {
                             ),
                         type: toolMetadata?.type ?? DEFAULT_GRADIENT_SHAPE,
                         pattern: toolMetadata?.pattern,
+                        blendMode: toolMetadata?.blendMode,
                         stops:
                             toolMetadata?.stops ??
                             getDefaultStops(context.metadata),
