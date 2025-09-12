@@ -1,7 +1,7 @@
 {
     "name": "owlbear-gradient",
     "type": "module",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "A tool in the drawing category that adds gradients to drawings",
     "scripts": {
         "dev": "vite",
