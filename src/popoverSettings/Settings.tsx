@@ -2,6 +2,7 @@ import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import LayersIcon from "@mui/icons-material/Layers";
 import {
     Paper,
+    Skeleton,
     Stack,
     ToggleButton,
     ToggleButtonGroup,
@@ -78,8 +79,17 @@ function gradientObjectStops(gradientObject: GradientObject): GradientStop[] {
     });
 }
 
-function useLoadToolMetadata<M>(id: Tool["id"], key: keyof Metadata) {
-    const [loadedMetadata, setLoadedMetadata] = useState<M>();
+/**
+ * @returns undefined if still loading
+ * @returns null if loaded but metadata doesn't exist
+ * @returns metadata if it exists.
+ */
+function useLoadToolMetadata<M>(
+    id: Tool["id"],
+    key: keyof Metadata,
+): NonNullable<M> | null | undefined {
+    const [loadedMetadata, setLoadedMetadata] =
+        useState<NonNullable<M> | null>();
 
     // Effect to load metadata from OBR
     useEffect(() => {
@@ -87,6 +97,8 @@ function useLoadToolMetadata<M>(id: Tool["id"], key: keyof Metadata) {
             const data = md?.[key] as M | undefined;
             if (data) {
                 setLoadedMetadata(data);
+            } else {
+                setLoadedMetadata(null);
             }
         });
     }, [id, key]);
@@ -117,7 +129,9 @@ function useSaveToolMetadata<M>(
 }
 
 function SettingsTabs() {
-    const [toolMetadata, setToolMetadata] = useState<ToolMetadata>();
+    const [toolMetadata, setToolMetadata] = useState<ToolMetadata>(
+        DEFAULT_TOOL_METADATA,
+    );
     const loadedToolMetadata = useLoadToolMetadata<ToolMetadata>(
         ID_TOOL_DRAWING,
         METADATA_KEY_GRADIENT,
@@ -126,7 +140,7 @@ function SettingsTabs() {
         ID_TOOL_DRAWING,
         METADATA_KEY_GRADIENT,
         toolMetadata,
-        !!loadedToolMetadata,
+        loadedToolMetadata !== undefined,
     );
     const [openFlyout, setOpenFlyout] = useState<string | undefined>();
     const [needsSetLinear, setNeedsSetLinear] = useState(false);
@@ -175,9 +189,6 @@ function SettingsTabs() {
     function setPattern(pattern?: Pattern) {
         setToolMetadata(
             produce(toolMetadata, (draft) => {
-                if (!draft) {
-                    return;
-                }
                 draft.pattern = pattern;
             }),
         );
@@ -189,9 +200,6 @@ function SettingsTabs() {
     function setBlendMode(blendMode?: BlendMode): void {
         setToolMetadata(
             produce(toolMetadata, (draft) => {
-                if (!draft) {
-                    return;
-                }
                 draft.blendMode = blendMode;
             }),
         );
@@ -199,78 +207,77 @@ function SettingsTabs() {
 
     const box = usePopoverResizer(ID_POPOVER_SETTINGS, 10, 1000, 0, 600);
 
-    return (
-        toolMetadata && (
-            <Stack
-                direction="row"
-                gap={1}
-                ref={box}
-                sx={{ display: "inline-flex" }}
+    return loadedToolMetadata !== undefined ? (
+        <Stack
+            direction="row"
+            gap={1}
+            ref={box}
+            sx={{ display: "inline-flex" }}
+        >
+            <ColorPicker
+                value={toolMetadata.css}
+                onChange={setGradientCss}
+                hideEyeDrop
+                hideColorTypeBtns
+            />
+            <ToggleButtonGroup
+                orientation="vertical"
+                value={openFlyout}
+                exclusive
+                onChange={(_, v?: string) => setOpenFlyout(v)}
             >
-                <ColorPicker
-                    value={toolMetadata.css}
-                    onChange={setGradientCss}
-                    hideEyeDrop
-                    hideColorTypeBtns
-                />
-                <ToggleButtonGroup
-                    orientation="vertical"
-                    value={openFlyout}
-                    exclusive
-                    onChange={(_, v?: string) => setOpenFlyout(v)}
+                <ToggleButton
+                    value="pattern"
+                    aria-label="Toggle Pattern Settings"
                 >
-                    <ToggleButton
-                        value="pattern"
-                        aria-label="Toggle Pattern Settings"
+                    <AutoAwesomeMotionIcon />
+                </ToggleButton>
+                <ToggleButton
+                    value="blend-mode"
+                    aria-label="Toggle Blend Mode Settings"
+                >
+                    <LayersIcon />
+                </ToggleButton>
+            </ToggleButtonGroup>
+            {openFlyout === "pattern" && (
+                <Paper sx={{ p: 1 }}>
+                    <PatternSettings
+                        toolMetadata={toolMetadata}
+                        onPatternChange={setPattern}
+                        primaryColor={rgbToHex(
+                            toolMetadata.stops[0]?.color ?? WHITE_RGB,
+                        )}
+                        secondaryColor={rgbToHex(
+                            toolMetadata.stops[toolMetadata.stops.length - 1]
+                                ?.color ?? WHITE_RGB,
+                        )}
+                    />
+                </Paper>
+            )}
+            {openFlyout === "blend-mode" && (
+                <Paper sx={{ p: 1, maxHeight: 590, overflowY: "auto" }}>
+                    <Typography sx={{ mb: 2, textAlign: "center" }}>
+                        Blend Mode
+                    </Typography>
+                    <ToggleButtonGroup
+                        orientation="vertical"
+                        value={toolMetadata.blendMode ?? "SRC_OVER"}
+                        exclusive
+                        onChange={(_, v?: BlendMode) => {
+                            setBlendMode(v);
+                        }}
                     >
-                        <AutoAwesomeMotionIcon />
-                    </ToggleButton>
-                    <ToggleButton
-                        value="blend-mode"
-                        aria-label="Toggle Blend Mode Settings"
-                    >
-                        <LayersIcon />
-                    </ToggleButton>
-                </ToggleButtonGroup>
-                {openFlyout === "pattern" && (
-                    <Paper sx={{ p: 1 }}>
-                        <PatternSettings
-                            toolMetadata={toolMetadata}
-                            onPatternChange={setPattern}
-                            primaryColor={rgbToHex(
-                                toolMetadata.stops[0]?.color ?? WHITE_RGB,
-                            )}
-                            secondaryColor={rgbToHex(
-                                toolMetadata.stops[
-                                    toolMetadata.stops.length - 1
-                                ]?.color ?? WHITE_RGB,
-                            )}
-                        />
-                    </Paper>
-                )}
-                {openFlyout === "blend-mode" && (
-                    <Paper sx={{ p: 1, maxHeight: 590, overflowY: "auto" }}>
-                        <Typography sx={{ mb: 2, textAlign: "center" }}>
-                            Blend Mode
-                        </Typography>
-                        <ToggleButtonGroup
-                            orientation="vertical"
-                            value={toolMetadata.blendMode ?? "SRC_OVER"}
-                            exclusive
-                            onChange={(_, v?: BlendMode) => {
-                                setBlendMode(v);
-                            }}
-                        >
-                            {BLEND_MODES.map((mode) => (
-                                <ToggleButton key={mode} value={mode}>
-                                    {mode}
-                                </ToggleButton>
-                            ))}
-                        </ToggleButtonGroup>
-                    </Paper>
-                )}
-            </Stack>
-        )
+                        {BLEND_MODES.map((mode) => (
+                            <ToggleButton key={mode} value={mode}>
+                                {mode}
+                            </ToggleButton>
+                        ))}
+                    </ToggleButtonGroup>
+                </Paper>
+            )}
+        </Stack>
+    ) : (
+        <Skeleton width={350} height={600} />
     );
 }
 
