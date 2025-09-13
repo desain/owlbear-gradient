@@ -1,5 +1,5 @@
-import AutoAwesomeMotionIcon from "@mui/icons-material/AutoAwesomeMotion";
 import LayersIcon from "@mui/icons-material/Layers";
+import Texture from "@mui/icons-material/Texture";
 import {
     Paper,
     Skeleton,
@@ -230,7 +230,7 @@ function SettingsTabs() {
                     value="pattern"
                     aria-label="Toggle Pattern Settings"
                 >
-                    <AutoAwesomeMotionIcon />
+                    <Texture />
                 </ToggleButton>
                 <ToggleButton
                     value="blend-mode"
