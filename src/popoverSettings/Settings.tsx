@@ -21,6 +21,7 @@ import {
     DO_NOTHING,
     getTheme,
     rgbToHex,
+    usePopoverResizer,
     WHITE_RGB,
     zeroToOne,
     type RgbColor,
@@ -35,7 +36,6 @@ import {
 import { type GradientStop, type Pattern } from "../tool/GradientTarget";
 import { DEFAULT_TOOL_METADATA, type ToolMetadata } from "../tool/ToolMetadata";
 import { PatternSettings } from "./PatternSettings";
-import { usePopoverResizer } from "./usePopoverResizer";
 
 type GradientObject = ReturnType<
     ReturnType<typeof useColorPicker>["getGradientObject"]

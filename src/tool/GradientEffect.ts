@@ -5,11 +5,7 @@ import {
     type Item,
     type Vector2,
 } from "@owlbear-rodeo/sdk";
-import {
-    pairs,
-    withIndices,
-    type HasParameterizedMetadata,
-} from "owlbear-utils";
+import { pairs, range, type HasParameterizedMetadata } from "owlbear-utils";
 import { METADATA_KEY_GRADIENT, METADATA_KEY_IS_GRADIENT } from "../constants";
 import type { GradientShape, GradientTarget, Pattern } from "./GradientTarget";
 
@@ -101,7 +97,6 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
         })),
     ];
 
-    const indexedStops = [...withIndices(metadata.stops)];
     const colorLast = color(metadata.stops.length - 1);
     effect.sksl = `
         ${metadata.controlPointOffsets
@@ -139,9 +134,9 @@ export function fixEffect(target: GradientTarget, effect: Effect) {
 
         vec4 gradient(vec2 st) {
             if (st.s <= ${left(0)}) return ${color(0)};
-            ${[...pairs(indexedStops)]
+            ${[...pairs([...range(metadata.stops.length)])]
                 .map(
-                    ([[, ai], [, bi]]) => `else if (st.s <= ${left(bi)}) {
+                    ([ai, bi]) => `else if (st.s <= ${left(bi)}) {
                         float a = (st.s - ${left(ai)}) / (${left(bi)} - ${left(
                         ai,
                     )});

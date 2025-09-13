@@ -45,7 +45,6 @@
         "owlbear-utils": "github:desain/owlbear-utils",
         "react": "^19.1.1",
         "react-best-gradient-color-picker": "^3.0.14",
-        "react-dom": "^19.1.1",
-        "tinycolor2": "^1.6.0"
+        "react-dom": "^19.1.1"
     }
 }
